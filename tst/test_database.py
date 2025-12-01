@@ -1,7 +1,7 @@
 import pytest
 import aiosqlite
 import os
-from database import Database
+from src.database import Database
 from datetime import datetime
 
 # Test database path

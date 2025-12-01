@@ -19,6 +19,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application files
 COPY bot.py .
 COPY database.py .
+COPY api.py .
+COPY entrypoint.sh .
+
+# Make entrypoint script executable
+RUN chmod +x entrypoint.sh
 
 # Create a non-root user for security
 RUN useradd -m -u 1000 botuser && \
@@ -30,5 +35,8 @@ USER botuser
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Run the bot
-CMD ["python", "bot.py"]
+# Expose API port
+EXPOSE 5000
+
+# Run both services via entrypoint script
+CMD ["./entrypoint.sh"]
