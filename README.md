@@ -133,18 +133,75 @@ The bot uses SQLite to store:
 
 The database is automatically initialized with 10 starter questions when you first run the bot.
 
+## Development
+
+### Running Tests
+
+This project includes comprehensive tests for all database operations:
+
+```bash
+# Install test dependencies
+pip install -r requirements.txt
+
+# Run all tests
+pytest
+
+# Run tests with coverage
+pytest --cov=. --cov-report=term-missing
+
+# Or use the Makefile
+make test
+make test-cov
+```
+
+### Code Quality
+
+We use several tools to maintain code quality:
+
+```bash
+# Format code with Black
+make format
+
+# Run linting checks
+make lint
+
+# Clean up generated files
+make clean
+```
+
+### GitHub Actions
+
+The project includes a CI/CD pipeline that runs on every push and pull request:
+
+- ✅ **Tests** - Runs on Python 3.9, 3.10, 3.11, and 3.12
+- ✅ **Linting** - Checks code style with flake8 and black
+- ✅ **Security** - Scans for security issues with bandit
+- ✅ **Coverage** - Reports test coverage to Codecov
+
+See `.github/workflows/test.yml` for details.
+
 ## Project Structure
 
 ```
 WYRDiscordBot/
-├── bot.py              # Main bot code with commands and events
-├── database.py         # Database operations and queries
-├── requirements.txt    # Python dependencies
-├── .env               # Your bot token (DO NOT COMMIT THIS)
-├── .env.example       # Example env file
-├── .gitignore         # Git ignore rules
-├── wyr_bot.db         # SQLite database (auto-generated)
-└── README.md          # This file
+├── bot.py                   # Main bot code with commands and events
+├── database.py              # Database operations and queries
+├── test_database.py         # Comprehensive test suite
+├── requirements.txt         # Python dependencies
+├── requirements-dev.txt     # Development dependencies
+├── pytest.ini              # Pytest configuration
+├── pyproject.toml          # Black and coverage configuration
+├── .flake8                 # Flake8 linting configuration
+├── Makefile                # Convenient development commands
+├── .env                    # Your bot token (DO NOT COMMIT THIS)
+├── .env.example            # Example env file
+├── .gitignore              # Git ignore rules
+├── .github/
+│   └── workflows/
+│       └── test.yml        # GitHub Actions CI/CD pipeline
+├── wyr_bot.db              # SQLite database (auto-generated)
+├── README.md               # This file
+└── CONTRIBUTING.md         # Contribution guidelines
 ```
 
 ## Troubleshooting
@@ -156,7 +213,27 @@ WYRDiscordBot/
 
 ## Contributing
 
-Feel free to add more questions, features, or improvements!
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+- Setting up your development environment
+- Running tests
+- Code style and formatting
+- Submitting pull requests
+
+Quick start for contributors:
+```bash
+# Fork and clone the repo
+git clone https://github.com/YOUR_USERNAME/WYRDiscordBot.git
+cd WYRDiscordBot
+
+# Install dev dependencies
+pip install -r requirements-dev.txt
+
+# Make your changes and test
+make test
+make lint
+
+# Submit a pull request!
+```
 
 ## License
 
