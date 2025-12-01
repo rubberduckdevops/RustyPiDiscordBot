@@ -5,7 +5,8 @@ from database import Database
 from datetime import datetime
 
 # Test database path
-TEST_DB = 'test_wyr_bot.db'
+TEST_DB = "test_wyr_bot.db"
+
 
 @pytest.fixture
 async def db():
@@ -22,6 +23,7 @@ async def db():
     if os.path.exists(TEST_DB):
         os.remove(TEST_DB)
 
+
 @pytest.mark.asyncio
 async def test_database_initialization(db):
     """Test that database initializes with starter questions"""
@@ -29,24 +31,18 @@ async def test_database_initialization(db):
     assert question is not None
     assert len(question) == 5  # id, question, option_a, option_b, category
 
+
 @pytest.mark.asyncio
 async def test_add_question(db):
     """Test adding a new question"""
-    await db.add_question(
-        "Test question?",
-        "Option A",
-        "Option B",
-        "Test Category"
-    )
+    await db.add_question("Test question?", "Option A", "Option B", "Test Category")
 
     # Verify question was added
     async with aiosqlite.connect(TEST_DB) as conn:
-        cursor = await conn.execute(
-            'SELECT COUNT(*) FROM questions WHERE question = ?',
-            ("Test question?",)
-        )
+        cursor = await conn.execute("SELECT COUNT(*) FROM questions WHERE question = ?", ("Test question?",))
         count = await cursor.fetchone()
         assert count[0] == 1
+
 
 @pytest.mark.asyncio
 async def test_user_creation(db):
@@ -54,10 +50,11 @@ async def test_user_creation(db):
     user_id = 123456789
     user = await db.get_user(user_id)
 
-    assert user['user_id'] == user_id
-    assert user['coins'] == 0
-    assert user['streak'] == 0
-    assert user['total_votes'] == 0
+    assert user["user_id"] == user_id
+    assert user["coins"] == 0
+    assert user["streak"] == 0
+    assert user["total_votes"] == 0
+
 
 @pytest.mark.asyncio
 async def test_award_coins(db):
@@ -69,12 +66,13 @@ async def test_award_coins(db):
 
     # Verify coins were awarded
     user = await db.get_user(user_id)
-    assert user['coins'] == 50
+    assert user["coins"] == 50
 
     # Award more coins
     await db.award_coins(user_id, 25)
     user = await db.get_user(user_id)
-    assert user['coins'] == 75
+    assert user["coins"] == 75
+
 
 @pytest.mark.asyncio
 async def test_record_vote(db):
@@ -83,7 +81,7 @@ async def test_record_vote(db):
     question_id = 1
 
     # Record vote
-    await db.record_vote(user_id, question_id, 'a')
+    await db.record_vote(user_id, question_id, "a")
 
     # Verify vote was recorded
     has_voted = await db.has_user_voted(user_id, question_id)
@@ -93,20 +91,22 @@ async def test_record_vote(db):
     has_voted_again = await db.has_user_voted(user_id, question_id)
     assert has_voted_again is True
 
+
 @pytest.mark.asyncio
 async def test_question_results(db):
     """Test getting voting results"""
     question_id = 1
 
     # Record some votes
-    await db.record_vote(111, question_id, 'a')
-    await db.record_vote(222, question_id, 'a')
-    await db.record_vote(333, question_id, 'b')
+    await db.record_vote(111, question_id, "a")
+    await db.record_vote(222, question_id, "a")
+    await db.record_vote(333, question_id, "b")
 
     # Get results
     results = await db.get_question_results(question_id)
-    assert results['a_votes'] == 2
-    assert results['b_votes'] == 1
+    assert results["a_votes"] == 2
+    assert results["b_votes"] == 1
+
 
 @pytest.mark.asyncio
 async def test_leaderboard(db):
@@ -124,6 +124,7 @@ async def test_leaderboard(db):
     assert leaderboard[1][1] == 150  # User 333 should be second
     assert leaderboard[2][1] == 100  # User 111 should be third
 
+
 @pytest.mark.asyncio
 async def test_streak_tracking(db):
     """Test daily streak tracking"""
@@ -132,25 +133,20 @@ async def test_streak_tracking(db):
     # First vote - should set streak to 1
     await db.update_streak(user_id)
     user = await db.get_user(user_id)
-    assert user['streak'] == 1
+    assert user["streak"] == 1
 
     # Same day vote - streak should stay 1
     await db.update_streak(user_id)
     user = await db.get_user(user_id)
-    assert user['streak'] == 1
+    assert user["streak"] == 1
+
 
 @pytest.mark.asyncio
 async def test_submit_question(db):
     """Test submitting a question for approval"""
     submitter_id = 123456789
 
-    await db.submit_question(
-        submitter_id,
-        "Submitted question?",
-        "Sub Option A",
-        "Sub Option B",
-        "Submitted"
-    )
+    await db.submit_question(submitter_id, "Submitted question?", "Sub Option A", "Sub Option B", "Submitted")
 
     # Get pending submissions
     pending = await db.get_pending_submissions(10)
@@ -161,6 +157,7 @@ async def test_submit_question(db):
     assert submission[1] == submitter_id
     assert submission[2] == "Submitted question?"
 
+
 @pytest.mark.asyncio
 async def test_approve_submission(db):
     """Test approving a submitted question"""
@@ -168,13 +165,7 @@ async def test_approve_submission(db):
     reviewer_id = 987654321
 
     # Submit a question
-    await db.submit_question(
-        submitter_id,
-        "Approve me?",
-        "Yes",
-        "No",
-        "Test"
-    )
+    await db.submit_question(submitter_id, "Approve me?", "Yes", "No", "Test")
 
     # Get submission ID
     pending = await db.get_pending_submissions(1)
@@ -186,16 +177,14 @@ async def test_approve_submission(db):
 
     # Verify it's in the questions table
     async with aiosqlite.connect(TEST_DB) as conn:
-        cursor = await conn.execute(
-            'SELECT COUNT(*) FROM questions WHERE question = ?',
-            ("Approve me?",)
-        )
+        cursor = await conn.execute("SELECT COUNT(*) FROM questions WHERE question = ?", ("Approve me?",))
         count = await cursor.fetchone()
         assert count[0] == 1
 
     # Verify submission status changed
     submission = await db.get_submission_by_id(submission_id)
-    assert submission[6] == 'approved'
+    assert submission[6] == "approved"
+
 
 @pytest.mark.asyncio
 async def test_reject_submission(db):
@@ -204,13 +193,7 @@ async def test_reject_submission(db):
     reviewer_id = 987654321
 
     # Submit a question
-    await db.submit_question(
-        submitter_id,
-        "Reject me?",
-        "Yes",
-        "No",
-        "Test"
-    )
+    await db.submit_question(submitter_id, "Reject me?", "Yes", "No", "Test")
 
     # Get submission ID
     pending = await db.get_pending_submissions(1)
@@ -221,7 +204,8 @@ async def test_reject_submission(db):
 
     # Verify submission status changed
     submission = await db.get_submission_by_id(submission_id)
-    assert submission[6] == 'rejected'
+    assert submission[6] == "rejected"
+
 
 @pytest.mark.asyncio
 async def test_daily_channel_settings(db):
@@ -235,15 +219,16 @@ async def test_daily_channel_settings(db):
     # Get settings
     config = await db.get_daily_channel(guild_id)
     assert config is not None
-    assert config['channel_id'] == channel_id
-    assert config['enabled'] is True
+    assert config["channel_id"] == channel_id
+    assert config["enabled"] is True
 
     # Disable daily questions
     await db.disable_daily_questions(guild_id)
 
     # Verify disabled
     config = await db.get_daily_channel(guild_id)
-    assert config['enabled'] is False
+    assert config["enabled"] is False
+
 
 @pytest.mark.asyncio
 async def test_get_user_submissions(db):
@@ -259,6 +244,7 @@ async def test_get_user_submissions(db):
     submissions = await db.get_user_submissions(user_id)
     assert len(submissions) == 3
 
+
 @pytest.mark.asyncio
 async def test_get_question_by_id(db):
     """Test retrieving a specific question by ID"""
@@ -273,6 +259,7 @@ async def test_get_question_by_id(db):
     retrieved = await db.get_question_by_id(question_id)
     assert retrieved is not None
     assert retrieved[0] == question_id
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
