@@ -218,21 +218,21 @@ HTML_TEMPLATE = """
 </html>
 """
 
+
 def get_db_connection():
     """Create a database connection"""
-    conn = sqlite3.connect('wyr_bot.db')
+    conn = sqlite3.connect("wyr_bot.db")
     conn.row_factory = sqlite3.Row
     return conn
 
-@app.route('/')
+
+@app.route("/")
 def index():
     """Display all questions from the database"""
     conn = get_db_connection()
 
     # Get all questions
-    questions = conn.execute(
-        'SELECT id, question, option_a, option_b, category FROM questions ORDER BY id'
-    ).fetchall()
+    questions = conn.execute("SELECT id, question, option_a, option_b, category FROM questions ORDER BY id").fetchall()
 
     # Get vote counts for each question
     questions_with_votes = []
@@ -241,39 +241,38 @@ def index():
     for q in questions:
         # Get vote counts for this question
         votes = conn.execute(
-            'SELECT choice, COUNT(*) as count FROM votes WHERE question_id = ? GROUP BY choice',
-            (q['id'],)
+            "SELECT choice, COUNT(*) as count FROM votes WHERE question_id = ? GROUP BY choice", (q["id"],)
         ).fetchall()
 
         a_votes = 0
         b_votes = 0
 
         for vote in votes:
-            if vote['choice'] == 'a':
-                a_votes = vote['count']
-            elif vote['choice'] == 'b':
-                b_votes = vote['count']
+            if vote["choice"] == "a":
+                a_votes = vote["count"]
+            elif vote["choice"] == "b":
+                b_votes = vote["count"]
 
         total_votes += a_votes + b_votes
 
-        questions_with_votes.append({
-            'id': q['id'],
-            'question': q['question'],
-            'option_a': q['option_a'],
-            'option_b': q['option_b'],
-            'category': q['category'],
-            'a_votes': a_votes,
-            'b_votes': b_votes
-        })
+        questions_with_votes.append(
+            {
+                "id": q["id"],
+                "question": q["question"],
+                "option_a": q["option_a"],
+                "option_b": q["option_b"],
+                "category": q["category"],
+                "a_votes": a_votes,
+                "b_votes": b_votes,
+            }
+        )
 
     conn.close()
 
     return render_template_string(
-        HTML_TEMPLATE,
-        questions=questions_with_votes,
-        total_questions=len(questions_with_votes),
-        total_votes=total_votes
+        HTML_TEMPLATE, questions=questions_with_votes, total_questions=len(questions_with_votes), total_votes=total_votes
     )
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
