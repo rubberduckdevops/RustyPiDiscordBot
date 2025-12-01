@@ -64,6 +64,48 @@ cp .env.example .env
 python bot.py
 ```
 
+## Docker Setup (Alternative)
+
+You can also run the bot using Docker:
+
+### Option 1: Using Docker Compose (Recommended)
+
+```bash
+# Make sure you have .env file configured with your bot token
+cp .env.example .env
+# Edit .env with your actual token
+
+# Build and start the bot
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the bot
+docker-compose down
+```
+
+### Option 2: Using Docker directly
+
+```bash
+# Build the image
+docker build -t wyr-discord-bot .
+
+# Run the container
+docker run -d \
+  --name wyr-bot \
+  --env-file .env \
+  -v $(pwd)/wyr_bot.db:/app/wyr_bot.db \
+  wyr-discord-bot
+
+# View logs
+docker logs -f wyr-bot
+
+# Stop the bot
+docker stop wyr-bot
+docker rm wyr-bot
+```
+
 ## Commands
 
 All commands use Discord's slash command system. Just type `/` in Discord to see all available commands!

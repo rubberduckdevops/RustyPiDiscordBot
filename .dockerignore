@@ -1,0 +1,51 @@
+# Virtual environment
+venv/
+env/
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# Git
+.git/
+.gitignore
+.github/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Documentation
+README.md
+TESTING.md
+CONTRIBUTING.md
+
+# Database (will be created in container)
+*.db
+*.db-journal
+
+# Development files
+Makefile
+requirements-dev.txt
+test_*.py
+pytest.ini
+pyproject.toml
+.flake8
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

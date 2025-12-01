@@ -1,0 +1,20 @@
+services:
+  bot:
+    image: wyr-discord-bot
+    build: .
+    container_name: wyr-discord-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # Persist the database
+      - ./wyr_bot.db:/app/wyr_bot.db
+    # Resource limits (optional, adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M

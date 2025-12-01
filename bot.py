@@ -38,6 +38,7 @@ class VoteView(View):
 
     async def process_vote(self, interaction: discord.Interaction, choice: str):
         # Check if user already voted on this question
+        print(f"User: {interaction.user.id} is voting")
         has_voted = await db.has_user_voted(interaction.user.id, self.question_id)
 
         if has_voted:
